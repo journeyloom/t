@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>JourneyLoom Packages — Mobile Editor</title>
+<style>
+  :root{--bg:#0f1724;--card:#0b1220;--muted:#9aa4b2;--accent:#06b6d4;--danger:#ef4444}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;background:linear-gradient(180deg,#071023 0%, #071628 100%);color:#e6eef6;-webkit-font-smoothing:antialiased}
+  header{padding:14px;border-bottom:1px solid rgba(255,255,255,0.03);display:flex;gap:12px;align-items:center}
+  h1{font-size:16px;margin:0}
+  .container{padding:12px;max-width:980px;margin:0 auto}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+  button, .btn{background:var(--accent);color:#012;border:0;padding:10px 12px;border-radius:10px;font-weight:600}
+  .btn.secondary{background:transparent;color:var(--accent);border:1px solid rgba(255,255,255,0.05)}
+  .btn.warn{background:var(--danger);color:white}
+  .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:12px;border-radius:12px;margin-bottom:12px;border:1px solid rgba(255,255,255,0.03)}
+  .flex{display:flex;gap:8px;align-items:center}
+  label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px}
+  input[type="text"], input[type="number"], textarea, select{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit;outline:none}
+  .row{display:flex;gap:8px}
+  .col{flex:1}
+  .small{font-size:12px;color:var(--muted)}
+  .itinerary-item{padding:8px;border-radius:8px;margin-bottom:8px;background:rgba(255,255,255,0.01);display:flex;gap:8px;align-items:flex-start}
+  .itinerary-item textarea{min-height:48px;resize:vertical}
+  .actions{display:flex;gap:8px;flex-wrap:wrap}
+  .package-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .img-preview{height:70px;width:120px;border-radius:8px;object-fit:cover;border:1px solid rgba(255,255,255,0.03)}
+  .muted{color:var(--muted)}
+  .danger{color:var(--danger)}
+  .import-area{min-height:80px}
+  .footer-note{font-size:12px;color:var(--muted);margin-top:8px}
+  @media (min-width:760px){header h1{font-size:20px}}
+</style>
+</head>
+<body>
+<header>
+  <div style="flex:1">
+    <h1>JourneyLoom — Packages Editor</h1>
+    <div class="small">Edit packages on phone, autosave to cache, export JS/JSON</div>
+  </div>
+  <div style="text-align:right;min-width:120px">
+    <div class="small muted">Saved locally</div>
+    <div id="savedIndicator" class="small">—</div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="controls">
+    <button id="addPackageBtn">➕ Add Package</button>
+    <button id="resetBtn" class="btn secondary">Reset to template</button>
+    <button id="clearLocalBtn" class="btn secondary">Clear local save</button>
+    <button id="exportJsBtn">Export JS</button>
+    <button id="downloadJsBtn" class="btn secondary">Download .js</button>
+    <button id="downloadJsonBtn" class="btn secondary">Download .json</button>
+  </div>
+
+  <div class="card">
+    <label>Import existing JS array (paste your <code>const PACKAGES = [...]</code> snippet here)</label>
+    <textarea id="importArea" class="import-area" placeholder="Paste PACKAGES snippet or JSON here..."></textarea>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button id="importBtn" class="btn">Import</button>
+      <button id="pasteExampleBtn" class="btn secondary">Load example template</button>
+      <button id="copySampleBtn" class="btn secondary">Copy sample export</button>
+    </div>
+    <div class="footer-note">Tip: If your friend already has the small JS file, they can paste it here and press Import.</div>
+  </div>
+
+  <div id="packagesContainer"></div>
+
+  <div style="margin-top:14px" class="card">
+    <label>Export / Preview JS Snippet</label>
+    <textarea id="exportArea" readonly style="min-height:120px"></textarea>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button id="copyExportBtn" class="btn">Copy to clipboard</button>
+      <button id="formatJsonBtn" class="btn secondary">Pretty JSON</button>
+      <button id="minifyJsonBtn" class="btn secondary">Minify JSON</button>
+    </div>
+  </div>
+
+  <div class="small muted" style="margin-top:10px">
+    Made for mobile editing. Changes autosave in your browser (localStorage key: <code>journeyloom_packages</code>).
+  </div>
+</div>
+
+<script>
+(() => {
+  // Template data (same structure you provided but cleaned image strings)
+  const samplePackages = [
+    {
+      name: "Shimla Manali",
+      location: "Himachal Pradesh",
+      image: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=400&h=300&fit=crop",
+      price: 9600,
+      originalPrice: 12000,
+      discount: 20,
+      itinerary: [
+        { day: "Day 1", title: "Arrival in Shimla", description: "Welcome to Shimla! Check-in at hotel, evening Mall Road visit, and leisure time." },
+        { day: "Day 2", title: "Shimla Sightseeing", description: "Visit Kufri, Jakhoo Temple, Christ Church, and Ridge. Enjoy horse riding and local markets." },
+        { day: "Day 3", title: "Shimla to Manali", description: "Scenic drive to Manali via Kullu Valley. Check-in at hotel and relax." },
+        { day: "Day 4", title: "Manali Local Tour", description: "Explore Hadimba Temple, Vashisht Hot Springs, Tibetan Monastery, and Old Manali." },
+        { day: "Day 5", title: "Solang Valley Excursion", description: "Adventure day at Solang Valley - paragliding, zorbing, cable car ride." },
+        { day: "Day 6", title: "Departure", description: "Check-out and departure with wonderful memories." }
+      ]
+    },
+    {
+      name: "Kashmir Valley",
+      location: "Paradise on Earth",
+      image: "https://images.unsplash.com/photo-1609920658906-8223bd289001?w=400&h=300&fit=crop",
+      price: 15300,
+      originalPrice: 18000,
+      discount: 15,
+      itinerary: [
+        { day: "Day 1", title: "Arrival in Srinagar", description: "Airport pickup, check-in to houseboat, evening Shikara ride on Dal Lake." },
+        { day: "Day 2", title: "Srinagar Sightseeing", description: "Visit Mughal Gardens, Shankaracharya Temple, and explore local markets." },
+        { day: "Day 3", title: "Gulmarg Day Trip", description: "Excursion to Gulmarg, Gondola ride, skiing (seasonal), and scenic views." },
+        { day: "Day 4", title: "Pahalgam Excursion", description: "Visit Betaab Valley, Aru Valley, and Chandanwari. River rafting optional." },
+        { day: "Day 5", title: "Sonamarg Day Trip", description: "Journey to Sonamarg, visit Thajiwas Glacier, pony rides." },
+        { day: "Day 6", title: "Departure", description: "Last minute shopping and airport transfer." }
+      ]
+    },
+    {
+      name: "Ladakh Adventure",
+      location: "Land of High Passes",
+      image: "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=400&h=300&fit=crop",
+      price: 31500,
+      originalPrice: 35000,
+      discount: 10,
+      itinerary: [
+        { day: "Day 1", title: "Arrival in Leh", description: "Airport pickup, hotel check-in. Complete rest for acclimatization." },
+        { day: "Day 2", title: "Leh Local Sightseeing", description: "Visit Shanti Stupa, Leh Palace, Hall of Fame, and local markets." },
+        { day: "Day 3", title: "Leh to Nubra Valley", description: "Cross Khardung La Pass (18,380 ft), visit Diskit Monastery, camel safari in Hunder." },
+        { day: "Day 4", title: "Nubra to Pangong Lake", description: "Journey to Pangong via Shyok River, enjoy the changing colors of the lake." },
+        { day: "Day 5", title: "Pangong to Leh", description: "Return to Leh via Chang La Pass, visit Hemis Monastery." },
+        { day: "Day 6", title: "Departure", description: "Airport transfer with lifetime memories of Ladakh." }
+      ]
+    },
+    {
+      name: "Kerala Backwaters",
+      location: "God's Own Country",
+      image: "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=400&h=300&fit=crop",
+      price: 15000,
+      originalPrice: 20000,
+      discount: 25,
+      itinerary: [
+        { day: "Day 1", title: "Arrival in Cochin", description: "Airport pickup, visit Fort Kochi, Chinese fishing nets, and spice markets." },
+        { day: "Day 2", title: "Cochin to Munnar", description: "Drive to Munnar, visit tea gardens, Cheeyappara waterfalls." },
+        { day: "Day 3", title: "Munnar Sightseeing", description: "Eravikulam National Park, Mattupetty Dam, Echo Point, tea plantations." },
+        { day: "Day 4", title: "Munnar to Thekkady", description: "Transfer to Thekkady, spice plantation tour, boat ride on Periyar Lake." },
+        { day: "Day 5", title: "Thekkady to Alleppey", description: "Houseboat check-in, cruise through backwaters, overnight stay." },
+        { day: "Day 6", title: "Departure", description: "Houseboat check-out, transfer to Cochin airport." }
+      ]
+    },
+    {
+      name: "Goa Beaches",
+      location: "Sun, Sand & Sea",
+      image: "https://images.unsplash.com/photo-1569154941061-e231b4725ef1?w=400&h=300&fit=crop",
+      price: 10500,
+      originalPrice: 15000,
+      discount: 30,
+      itinerary: [
+        { day: "Day 1", title: "Arrival in Goa", description: "Airport pickup, hotel check-in, evening at Calangute Beach." },
+        { day: "Day 2", title: "North Goa Tour", description: "Visit Baga Beach, Anjuna Beach, Fort Aguada, and beach shacks." },
+        { day: "Day 3", title: "Water Sports Day", description: "Parasailing, jet skiing, banana boat rides at Calangute Beach." },
+        { day: "Day 4", title: "South Goa Exploration", description: "Palolem Beach, Colva Beach, churches, and Portuguese architecture." },
+        { day: "Day 5", title: "Leisure Day", description: "Relax at beach, shopping, spa, optional Dudhsagar Falls trip." },
+        { day: "Day 6", title: "Departure", description: "Check-out and airport transfer." }
+      ]
+    },
+    {
+      name: "Dubai Luxury",
+      location: "United Arab Emirates",
+      image: "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=400&h=300&fit=crop",
+      price: 39600,
+      originalPrice: 45000,
+      discount: 12,
+      itinerary: [
+        { day: "Day 1", title: "Arrival in Dubai", description: "Airport pickup, hotel check-in, evening at Dubai Marina and JBR Walk." },
+        { day: "Day 2", title: "Modern Dubai Tour", description: "Burj Khalifa (124th floor), Dubai Mall, Dubai Fountain show." },
+        { day: "Day 3", title: "Desert Safari", description: "Dune bashing, camel ride, BBQ dinner, traditional entertainment." },
+        { day: "Day 4", title: "Abu Dhabi Day Trip", description: "Sheikh Zayed Mosque, Emirates Palace, Heritage Village." },
+        { day: "Day 5", title: "Theme Parks & Shopping", description: "IMG Worlds or Dubai Parks, Mall of Emirates, Ski Dubai." },
+        { day: "Day 6", title: "Departure", description: "Last minute shopping at Gold Souk, airport transfer." }
+      ]
+    },
+    {
+      name: "Maldives Paradise",
+      location: "Tropical Heaven",
+      image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=400&h=300&fit=crop",
+      price: 61500,
+      originalPrice: 75000,
+      discount: 18,
+      itinerary: [
+        { day: "Day 1", title: "Arrival in Maldives", description: "Speedboat/seaplane transfer to resort, welcome drinks, beach relaxation." },
+        { day: "Day 2", title: "Water Villa Experience", description: "Snorkeling, swimming with tropical fish, sunset cruise." },
+        { day: "Day 3", title: "Island Hopping", description: "Visit local islands, traditional Maldivian lunch, dolphin watching." },
+        { day: "Day 4", title: "Water Activities", description: "Scuba diving, kayaking, paddleboarding, spa treatments." },
+        { day: "Day 5", title: "Relaxation Day", description: "Beach lounging, underwater restaurant dining, private sandbank." },
+        { day: "Day 6", title: "Departure", description: "Leisurely breakfast, transfer to airport." }
+      ]
+    },
+    {
+      name: "Thailand Explorer",
+      location: "Bangkok & Phuket",
+      image: "https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=400&h=300&fit=crop",
+      price: 21840,
+      originalPrice: 28000,
+      discount: 22,
+      itinerary: [
+        { day: "Day 1", title: "Arrival in Bangkok", description: "Airport pickup, hotel check-in, evening at Asiatique night market." },
+        { day: "Day 2", title: "Bangkok City Tour", description: "Grand Palace, Wat Pho, Wat Arun, Chao Phraya river cruise." },
+        { day: "Day 3", title: "Bangkok Shopping", description: "Chatuchak Market, MBK Center, Siam Paragon, street food tour." },
+        { day: "Day 4", title: "Bangkok to Phuket", description: "Flight to Phuket, Patong Beach, Bangla Road nightlife." },
+        { day: "Day 5", title: "Phi Phi Islands", description: "Full day speedboat tour, Maya Bay, snorkeling, beach activities." },
+        { day: "Day 6", title: "Departure", description: "Last minute beach time, shopping, airport transfer." }
+      ]
+    }
+  ];
+
+  // State & elements
+  let packages = [];
+  const storageKey = 'journeyloom_packages';
+  const packagesContainer = document.getElementById('packagesContainer');
+  const importArea = document.getElementById('importArea');
+  const exportArea = document.getElementById('exportArea');
+  const savedIndicator = document.getElementById('savedIndicator');
+
+  // Helpers
+  const nowStr = ()=> new Date().toLocaleString();
+
+  function saveLocal() {
+    localStorage.setItem(storageKey, JSON.stringify(packages));
+    savedIndicator.textContent = 'Saved ' + nowStr();
+  }
+
+  function loadLocal() {
+    const raw = localStorage.getItem(storageKey);
+    if (!raw) return false;
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) { packages = parsed; return true; }
+    } catch(e){ return false; }
+    return false;
+  }
+
+  function resetToTemplate() {
+    packages = JSON.parse(JSON.stringify(samplePackages));
+    renderPackages();
+    saveLocal();
+    updateExportArea();
+  }
+
+  // Render UI
+  function renderPackages() {
+    packagesContainer.innerHTML = '';
+    packages.forEach((pkg, idx) => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <div class="package-header">
+          <div style="display:flex;gap:10px;align-items:center">
+            <img src="${escapeHtml(pkg.image||'')}" alt="" class="img-preview" onerror="this.style.display='none'">
+            <div>
+              <div style="font-weight:700">${escapeHtml(pkg.name||'Untitled')}</div>
+              <div class="small muted">${escapeHtml(pkg.location||'')}</div>
+            </div>
+          </div>
+          <div class="actions">
+            <button data-action="moveUp" class="btn secondary" ${idx===0? 'disabled':''}>▲</button>
+            <button data-action="moveDown" class="btn secondary" ${idx===packages.length-1? 'disabled':''}>▼</button>
+            <button data-action="duplicate" class="btn secondary">⎘</button>
+            <button data-action="delete" class="btn warn">Delete</button>
+          </div>
+        </div>
+
+        <div class="row" style="margin-bottom:8px">
+          <div class="col">
+            <label>Package Name</label>
+            <input data-field="name" type="text" value="${escapeHtml(pkg.name||'')}">
+          </div>
+          <div style="width:120px">
+            <label>Price</label>
+            <input data-field="price" type="number" min="0" value="${Number(pkg.price||0)}">
+          </div>
+        </div>
+
+        <div class="row" style="margin-bottom:8px">
+          <div class="col">
+            <label>Location</label>
+            <input data-field="location" type="text" value="${escapeHtml(pkg.location||'')}">
+          </div>
+          <div style="width:120px">
+            <label>Original Price</label>
+            <input data-field="originalPrice" type="number" min="0" value="${Number(pkg.originalPrice||0)}">
+          </div>
+        </div>
+
+        <div style="margin-bottom:8px">
+          <label>Image URL (use full image URL)</label>
+          <input data-field="image" type="text" value="${escapeHtml(pkg.image||'')}">
+        </div>
+
+        <div style="margin-bottom:8px">
+          <label>Discount (%)</label>
+          <input data-field="discount" type="number" min="0" max="100" value="${Number(pkg.discount||0)}">
+        </div>
+
+        <div style="margin-top:6px">
+          <label>Itinerary</label>
+          <div data-itinerary></div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button data-action="addItinerary" class="btn">Add day</button>
+            <button data-action="collapseItin" class="btn secondary">Collapse</button>
+          </div>
+        </div>
+      `;
+      packagesContainer.appendChild(card);
+
+      // itinerary container
+      const itinContainer = card.querySelector('[data-itinerary]');
+      (pkg.itinerary||[]).forEach((it, itIdx) => {
+        const itDiv = document.createElement('div');
+        itDiv.className = 'itinerary-item';
+        itDiv.innerHTML = `
+          <div style="flex:1">
+            <input data-field="day" type="text" placeholder="Day X" value="${escapeHtml(it.day||'')}">
+            <input data-field="title" type="text" placeholder="Title" value="${escapeHtml(it.title||'')}">
+            <textarea data-field="description" placeholder="Description">${escapeHtml(it.description||'')}</textarea>
+          </div>
+          <div style="min-width:56px;display:flex;flex-direction:column;gap:6px">
+            <button data-action="upIt" class="btn secondary" ${itIdx===0?'disabled':''}>▲</button>
+            <button data-action="downIt" class="btn secondary" ${itIdx===pkg.itinerary.length-1?'disabled':''}>▼</button>
+            <button data-action="delIt" class="btn warn">✖</button>
+          </div>
+        `;
+        itinContainer.appendChild(itDiv);
+
+        // itinerary field listeners
+        ['day','title','description'].forEach(f => {
+          itDiv.querySelector(`[data-field="${f}"]`).addEventListener('input', (e)=>{
+            pkg.itinerary[itIdx][f]= e.target.value;
+            quickSave();
+          });
+        });
+
+        itDiv.querySelector('[data-action="upIt"]').addEventListener('click',()=>{
+          if(itIdx>0){ pkg.itinerary.splice(itIdx-1,0,pkg.itinerary.splice(itIdx,1)[0]); renderPackages(); quickSave(); }
+        });
+        itDiv.querySelector('[data-action="downIt"]').addEventListener('click',()=>{
+          if(itIdx < pkg.itinerary.length-1){ pkg.itinerary.splice(itIdx+1,0,pkg.itinerary.splice(itIdx,1)[0]); renderPackages(); quickSave(); }
+        });
+        itDiv.querySelector('[data-action="delIt"]').addEventListener('click',()=>{
+          pkg.itinerary.splice(itIdx,1); renderPackages(); quickSave();
+        });
+      });
+
+      // Package-level listeners
+      card.querySelectorAll('input[data-field], textarea[data-field]').forEach(el=>{
+        const field = el.getAttribute('data-field');
+        el.addEventListener('input', (e)=> {
+          const val = el.type === 'number' ? (el.valueAsNumber || 0) : el.value;
+          pkg[field] = val;
+          quickSave();
+        });
+      });
+
+      card.querySelector('[data-action="addItinerary"]').addEventListener('click', ()=>{
+        pkg.itinerary = pkg.itinerary || [];
+        pkg.itinerary.push({day:`Day ${ (pkg.itinerary.length||0)+1 }`, title:'', description:''});
+        renderPackages(); quickSave();
+      });
+
+      card.querySelector('[data-action="collapseItin"]').addEventListener('click', ()=>{
+        const itEl = card.querySelector('[data-itinerary]');
+        itEl.style.display = itEl.style.display === 'none' ? '' : 'none';
+      });
+
+      card.querySelector('[data-action="delete"]').addEventListener('click', ()=>{
+        if (!confirm('Delete this package?')) return;
+        packages.splice(idx,1); renderPackages(); quickSave();
+      });
+
+      card.querySelector('[data-action="duplicate"]').addEventListener('click', ()=>{
+        const clone = JSON.parse(JSON.stringify(pkg));
+        clone.name = clone.name + ' (copy)';
+        packages.splice(idx+1,0,clone); renderPackages(); quickSave();
+      });
+
+      card.querySelector('[data-action="moveUp"]').addEventListener('click', ()=>{
+        if (idx===0) return;
+        const [p] = packages.splice(idx,1);
+        packages.splice(idx-1,0,p);
+        renderPackages(); quickSave();
+      });
+      card.querySelector('[data-action="moveDown"]').addEventListener('click', ()=>{
+        if (idx===packages.length-1) return;
+        const [p] = packages.splice(idx,1);
+        packages.splice(idx+1,0,p);
+        renderPackages(); quickSave();
+      });
+    });
+
+    // after render update export
+    updateExportArea();
+  }
+
+  // small utility
+  function escapeHtml(s){ if(s==null) return ''; return String(s).replace(/[&<>"]/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c])); }
+
+  // Quick save throttle
+  let saveTimer = null;
+  function quickSave(){
+    if (saveTimer) clearTimeout(saveTimer);
+    saveTimer = setTimeout(()=>{ saveLocal(); updateExportArea(); }, 350);
+  }
+
+  function updateExportArea(pretty=true){
+    const js = 'const PACKAGES = ' + (pretty ? JSON.stringify(packages, null, 2) : JSON.stringify(packages)) + ';';
+    exportArea.value = js;
+  }
+
+  // Export handlers
+  function copyToClipboard(text){
+    navigator.clipboard?.writeText(text).then(()=> alert('Copied to clipboard'), ()=>{ prompt('Copy this text:', text) });
+  }
+
+  function download(filename, text){
+    const blob = new Blob([text], {type:'text/plain;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  // Import parsing: handle either raw JSON or "const PACKAGES = [...]"
+  function parseImport(raw){
+    if(!raw) return null;
+    raw = raw.trim();
+    try{
+      // try JSON directly
+      const j = JSON.parse(raw);
+      if (Array.isArray(j)) return j;
+    }catch(e){}
+    // try to extract array from const/let var assignment
+    try{
+      const arrMatch = raw.match(/=\s*(\[[\s\S]*\])\s*;?$/m);
+      if (arrMatch){
+        const arrStr = arrMatch[1];
+        return JSON.parse(arrStr);
+      }
+    }catch(e){}
+    // try to eval safely by creating a function returning packages (last resort)
+    try{
+      // remove "const", "let", "var" and take everything after '='
+      const eq = raw.indexOf('=');
+      if(eq>0){
+        const after = raw.slice(eq+1);
+        const arr = (new Function('return ' + after))();
+        if (Array.isArray(arr)) return arr;
+      }
+    }catch(e){}
+    return null;
+  }
+
+  // Buttons & actions
+  document.getElementById('addPackageBtn').addEventListener('click', ()=>{
+    packages.push({
+      name:'New Package',
+      location:'',
+      image:'',
+      price:0,
+      originalPrice:0,
+      discount:0,
+      itinerary:[]
+    });
+    renderPackages();
+    quickSave();
+    // scroll to bottom on mobile
+    window.scrollTo({top:document.body.scrollHeight, behavior:'smooth'});
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', ()=>{
+    if (!confirm('Reset editor to the example template? This will replace current unsaved changes.')) return;
+    resetToTemplate();
+  });
+
+  document.getElementById('clearLocalBtn').addEventListener('click', ()=>{
+    if (!confirm('Clear local saved data? This cannot be undone.')) return;
+    localStorage.removeItem(storageKey);
+    savedIndicator.textContent = 'Cleared';
+    packages = [];
+    renderPackages();
+    updateExportArea();
+  });
+
+  document.getElementById('importBtn').addEventListener('click', ()=>{
+    const raw = importArea.value;
+    const parsed = parseImport(raw);
+    if (!parsed) return alert('Could not parse input. Paste either a JSON array or a JS snippet like: const PACKAGES = [...]');
+    packages = parsed;
+    renderPackages();
+    saveLocal();
+    alert('Imported ' + packages.length + ' package(s).');
+  });
+
+  document.getElementById('pasteExampleBtn').addEventListener('click', ()=>{
+    importArea.value = 'const PACKAGES = ' + JSON.stringify(samplePackages, null, 2) + ';';
+  });
+
+  document.getElementById('copySampleBtn').addEventListener('click', ()=>{
+    copyToClipboard('const PACKAGES = ' + JSON.stringify(samplePackages, null, 2) + ';');
+  });
+
+  document.getElementById('exportJsBtn').addEventListener('click', ()=>{
+    updateExportArea(true);
+    copyToClipboard(exportArea.value);
+    alert('JS snippet copied to clipboard. You can paste it into your friend\'s site code.');
+  });
+
+  document.getElementById('downloadJsBtn').addEventListener('click', ()=>{
+    updateExportArea(true);
+    download('packages.js', exportArea.value);
+  });
+
+  document.getElementById('downloadJsonBtn').addEventListener('click', ()=>{
+    const json = JSON.stringify(packages, null, 2);
+    download('packages.json', json);
+  });
+
+  document.getElementById('copyExportBtn').addEventListener('click', ()=>{
+    updateExportArea(true);
+    copyToClipboard(exportArea.value);
+  });
+
+  document.getElementById('formatJsonBtn').addEventListener('click', ()=>{
+    updateExportArea(true);
+  });
+  document.getElementById('minifyJsonBtn').addEventListener('click', ()=>{
+    updateExportArea(false);
+  });
+
+  // initial load
+  if (!loadLocal()){
+    // if no saved data, populate sample
+    packages = JSON.parse(JSON.stringify(samplePackages));
+    saveLocal();
+  }
+  renderPackages();
+
+  // autosave before unload
+  window.addEventListener('beforeunload', saveLocal);
+
+  // small utility to keep UI responsive on mobile keyboards
+  window.addEventListener('resize', ()=>{ window.scrollTo(0, document.body.scrollHeight); });
+
+})();
+</script>
+</body>
+</html>
