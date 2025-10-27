@@ -96,24 +96,47 @@
         }
 
         .success-message {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) scale(0.8);
             background: #1e90ff;
             color: white;
-            padding: 8px;
+            padding: 10px 20px;
             border-radius: 6px;
-            margin-bottom: 8px;
             display: none;
-            font-size: 0.75em;
+            font-size: 0.8em;
             text-align: center;
-            animation: slideDown 0.3s;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
         }
 
         .success-message.show {
             display: block;
+            animation: toastPop 0.3s ease-out forwards, toastFade 0.4s ease-out 1.5s forwards;
         }
 
-        @keyframes slideDown {
-            from { transform: translateY(-10px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+        @keyframes toastPop {
+            from {
+                transform: translateX(-50%) scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes toastFade {
+            from {
+                opacity: 1;
+                transform: translateX(-50%) scale(1);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(-50%) scale(0.8);
+            }
         }
 
         .packages-list {
@@ -144,6 +167,16 @@
             font-family: 'Poppins', sans-serif;
             font-size: 0.95em;
             font-weight: 700;
+            flex: 1;
+        }
+
+        .package-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 4px;
+            object-fit: cover;
+            margin-right: 10px;
+            border: 1px solid rgba(255,255,255,0.3);
         }
 
         .toggle-icon {
@@ -412,12 +445,11 @@
             <button class="btn-danger" onclick="resetAllData()">Reset</button>
         </div>
 
-        <div class="success-message" id="successMsg">✓ Saved!</div>
-
         <div class="packages-list" id="packagesList"></div>
     </div>
 
-    <!-- Export Modal -->
+    <!-- Toast Notification -->
+    <div class="success-message" id="successMsg">✓ Saved!</div>
     <div id="exportModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeExportModal()">&times;</span>
@@ -489,7 +521,8 @@
             return `
                 <div class="package-card">
                     <div class="package-header" onclick="togglePackage(${index})">
-                        <h2>${pkg.name}</h2>
+                        <img src="${pkg.image}" alt="${pkg.name}" class="package-img" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22><rect fill=%22%23ccc%22 width=%22100%22 height=%22100%22/></svg>'">
+                        <h2 id="name-${index}">${pkg.name}</h2>
                         <span class="toggle-icon collapsed" id="icon-${index}">▼</span>
                     </div>
                     
@@ -512,15 +545,15 @@
                         <div class="price-group">
                             <div class="input-group">
                                 <label>Price</label>
-                                <input type="number" data-field="price" data-index="${index}" value="${pkg.price}">
+                                <input type="number" id="price-${index}" data-field="price" data-index="${index}" value="${pkg.price}" readonly style="background: #f0f0f0;">
                             </div>
                             <div class="input-group">
                                 <label>Original</label>
-                                <input type="number" data-field="originalPrice" data-index="${index}" value="${pkg.originalPrice}">
+                                <input type="number" data-field="originalPrice" data-index="${index}" value="${pkg.originalPrice}" onchange="updatePrice(${index})">
                             </div>
                             <div class="input-group">
                                 <label>Discount %</label>
-                                <input type="number" data-field="discount" data-index="${index}" value="${pkg.discount}">
+                                <input type="number" data-field="discount" data-index="${index}" value="${pkg.discount}" onchange="updatePrice(${index})">
                             </div>
                         </div>
 
@@ -545,13 +578,42 @@
         function attachPackageListeners(index) {
             const inputs = document.querySelectorAll(`input[data-index="${index}"], textarea[data-index="${index}"]`);
             inputs.forEach(input => {
-                input.addEventListener('change', function() {
+                input.addEventListener('input', function() {
                     const packages = loadData();
                     const field = this.getAttribute('data-field');
-                    packages[index][field] = isNaN(this.value) ? this.value : Number(this.value);
+                    const value = isNaN(this.value) ? this.value : Number(this.value);
+                    packages[index][field] = value;
+                    
+                    // Real-time UI update
+                    if (field === 'name') {
+                        document.getElementById(`name-${index}`).textContent = value;
+                    }
+                    if (field === 'image') {
+                        const img = document.querySelector(`[data-index="${index}"].package-card .package-img`);
+                        if (img) img.src = value;
+                    }
+                    
                     saveData(packages);
                 });
+                
+                input.addEventListener('change', function() {
+                    renderPackages();
+                });
             });
+        }
+
+        function updatePrice(index) {
+            const packages = loadData();
+            const original = packages[index].originalPrice;
+            const discount = packages[index].discount;
+            const calculated = Math.round(original - (original * discount / 100));
+            
+            packages[index].price = calculated;
+            
+            const priceInput = document.getElementById(`price-${index}`);
+            if (priceInput) priceInput.value = calculated;
+            
+            saveData(packages);
         }
 
         function togglePackage(index) {
@@ -645,6 +707,21 @@
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultPackages));
                 renderPackages();
                 showSuccessMessage();
+                
+                const btn = event.target;
+                btn.disabled = true;
+                btn.textContent = '⏳ Wait 10s...';
+                let countdown = 10;
+                
+                const interval = setInterval(() => {
+                    countdown--;
+                    btn.textContent = `⏳ Wait ${countdown}s...`;
+                    if (countdown === 0) {
+                        clearInterval(interval);
+                        btn.disabled = false;
+                        btn.textContent = 'Reset';
+                    }
+                }, 1000);
             }
         }
 
