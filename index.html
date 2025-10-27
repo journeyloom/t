@@ -1,82 +1,1003 @@
-const PACKAGES = [
-  {
-    "name": "Shimla Manalihuhh",
-    "location": "Himachal Pradesh",
-    "image": "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=400&h=300&fit=crop",
-    "price": 569600,
-    "originalPrice": 712000,
-    "discount": 20,
-    "itinerary": [
-      {
-        "day": "Day 2",
-        "title": "Shimla Sightseeing",
-        "description": "Visit Kufri, Jakhoo Temple, Christ Church, and Ridge. Enjoy horse riding and local markets."
-      },
-      {
-        "day": "Day 3",
-        "title": "Shimla to Manali",
-        "description": "Scenic drive to Manali via Kullu Valley. Check-in at hotel and relax."
-      },
-      {
-        "day": "Day 6",
-        "title": "Departure",
-        "description": "Check-out and departure with wonderful memories."
-      },
-      {
-        "day": "Day 7",
-        "title": "New Day",
-        "description": "Description"
-      }
-    ]
-  },
-  {
-    "name": "Yyyio",
-    "location": "Location",
-    "image": "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=400&h=300&fit=crop",
-    "price": 10000,
-    "originalPrice": 12000,
-    "discount": 15,
-    "itinerary": [
-      {
-        "day": "Da",
-        "title": "Arrival",
-        "description": "Arrival day descriptionkkk"
-      }
-    ]
-  },
-  {
-    "name": "New Package",
-    "location": "What",
-    "image": "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=400&h=300&fit=crop",
-    "price": 102005,
-    "originalPrice": 120006,
-    "discount": 15,
-    "itinerary": [
-      {
-        "day": "Day 1",
-        "title": "New Day",
-        "description": "Description"
-      },
-      {
-        "day": "Day 2",
-        "title": "New Day",
-        "description": "Description"
-      }
-    ]
-  },
-  {
-    "name": "Theog to Shimla",
-    "location": "Himachal pradesh ",
-    "image": "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=400&h=300&fit=crop",
-    "price": 10000,
-    "originalPrice": 12000,
-    "discount": 15,
-    "itinerary": [
-      {
-        "day": "Day 1",
-        "title": "Arrival",
-        "description": "Description"
-      }
-    ]
-  }
-];
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Package Editor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            color: #1a1a1a;
+            min-height: 100vh;
+            padding: 12px;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            border: 1px solid #e8e8e8;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .header h1 {
+            font-family: 'Poppins', sans-serif;
+            color: #1a1a1a;
+            font-size: 1.5em;
+            font-weight: 700;
+            margin-bottom: 4px;
+            background: linear-gradient(135deg, #1e90ff, #1575d9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: #999;
+            font-size: 0.75em;
+        }
+
+        .controls {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.8em;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex: 1;
+            min-width: 120px;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1e90ff 0%, #1575d9 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(30, 144, 255, 0.3);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+            box-shadow: 0 2px 10px rgba(30, 144, 255, 0.2);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn-danger:active {
+            transform: scale(0.98);
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            font-size: 1.1em;
+            padding: 6px 10px;
+            cursor: pointer;
+            min-width: auto;
+            flex: none;
+            transition: all 0.2s ease;
+        }
+
+        .icon-btn.edit {
+            color: #1e90ff;
+        }
+
+        .icon-btn.edit:hover {
+            transform: scale(1.2);
+            color: #1575d9;
+        }
+
+        .icon-btn.delete {
+            color: #ff6b6b;
+        }
+
+        .icon-btn.delete:hover {
+            transform: scale(1.2);
+            color: #ff5252;
+        }
+
+        .success-message {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) scale(0.8);
+            background: linear-gradient(135deg, #1e90ff 0%, #1575d9 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            display: none;
+            font-size: 0.8em;
+            text-align: center;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            box-shadow: 0 8px 25px rgba(30, 144, 255, 0.4);
+        }
+
+        .success-message.show {
+            display: block;
+            animation: toastPop 0.3s ease-out forwards, toastFade 0.4s ease-out 1.5s forwards;
+        }
+
+        @keyframes toastPop {
+            from {
+                transform: translateX(-50%) scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes toastFade {
+            from {
+                opacity: 1;
+                transform: translateX(-50%) scale(1);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(-50%) scale(0.8);
+            }
+        }
+
+        .packages-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .package-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e8e8e8;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .package-card:hover {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border-color: #d8d8d8;
+        }
+
+        .package-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            border-bottom: 1px solid #e8e8e8;
+            transition: all 0.2s ease;
+        }
+
+        .package-header:hover {
+            background: linear-gradient(135deg, #f0f0f0 0%, #f8f9fa 100%);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .package-img {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .package-header h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1em;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .toggle-icon {
+            font-size: 1.2em;
+            color: #1e90ff;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-icon.collapsed {
+            transform: rotate(0deg);
+        }
+
+        .toggle-icon.expanded {
+            transform: rotate(180deg);
+        }
+
+        .package-content {
+            display: none;
+            padding: 12px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .package-content.show {
+            display: block;
+            max-height: 5000px;
+        }
+
+        .content-item {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 3px solid #1e90ff;
+            border: 1px solid #e8e8e8;
+            transition: all 0.2s ease;
+        }
+
+        .content-item:hover {
+            background: linear-gradient(135deg, #f0f8ff 0%, #f8f9fa 100%);
+            border-color: #1e90ff;
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-label {
+            font-size: 0.65em;
+            color: #999;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 3px;
+            letter-spacing: 0.5px;
+        }
+
+        .item-value {
+            font-size: 0.85em;
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .itinerary-section {
+            background: linear-gradient(135deg, #f0f8ff 0%, #ffffff 100%);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 8px;
+            border: 1px solid #d8e8f8;
+        }
+
+        .itinerary-section h3 {
+            color: #1e90ff;
+            margin-bottom: 8px;
+            font-size: 0.85em;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .itinerary-toggle {
+            background: white;
+            border: 1px solid #e0e0e0;
+            padding: 8px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            font-size: 0.75em;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .itinerary-toggle:hover {
+            background: #f8f9fa;
+            border-color: #1e90ff;
+        }
+
+        .days-container {
+            display: none;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .days-container.show {
+            display: block;
+            max-height: 2000px;
+        }
+
+        .day-item {
+            background: white;
+            padding: 8px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            border: 1px solid #e8e8e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .day-item:hover {
+            border-color: #1e90ff;
+            box-shadow: 0 2px 8px rgba(30, 144, 255, 0.1);
+        }
+
+        .day-info {
+            flex: 1;
+            font-size: 0.75em;
+        }
+
+        .day-label {
+            color: #999;
+            font-size: 0.7em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .day-title {
+            color: #1a1a1a;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+
+        .day-desc {
+            color: #999;
+            font-size: 0.75em;
+            margin-top: 4px;
+            line-height: 1.3;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 12px;
+            width: 95%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border: 1px solid #e8e8e8;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .modal-content h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin: 0;
+        }
+
+        .close {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            color: #999;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .close:hover {
+            color: #1e90ff;
+            transform: scale(1.2);
+        }
+
+        .edit-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 0.8em;
+            font-weight: 700;
+            color: #333;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 0.85em;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #1e90ff;
+            background: #f0f8ff;
+            box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 70px;
+            resize: vertical;
+        }
+
+        .old-value {
+            font-size: 0.7em;
+            color: #999;
+            margin-top: 4px;
+            font-style: italic;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+            padding: 12px;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%);
+            color: #333;
+            border: 1px solid #ddd;
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #e8e8e8 0%, #d8d8d8 100%);
+        }
+
+        .code-output {
+            background: #1a1a1a;
+            color: #1e90ff;
+            padding: 12px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            font-size: 0.7em;
+            line-height: 1.5;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #333;
+        }
+
+        .add-btn-large {
+            padding: 10px;
+            width: 100%;
+            justify-content: center;
+            margin-top: 8px;
+            background: linear-gradient(135deg, #1e90ff 0%, #1575d9 100%);
+            color: white;
+            border-radius: 8px;
+            font-size: 0.8em;
+        }
+
+        .delete-btn-large {
+            padding: 10px;
+            width: 100%;
+            justify-content: center;
+            margin-top: 8px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+            color: white;
+            border-radius: 8px;
+            font-size: 0.8em;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+            }
+
+            button {
+                font-size: 0.75em;
+                padding: 8px 12px;
+            }
+
+            .modal-content {
+                width: 98%;
+                margin: 20% auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>✨ Package Editor Pro</h1>
+            <p>Professional travel package management - Auto-saves to device</p>
+        </div>
+
+        <div class="controls">
+            <button class="btn-primary" onclick="addNewPackage()">
+                <i class="fas fa-plus"></i> Add Package
+            </button>
+            <button class="btn-primary" onclick="openExportModal()">
+                <i class="fas fa-download"></i> Export Code
+            </button>
+            <button class="btn-danger" onclick="resetAllData()">
+                <i class="fas fa-redo"></i> Reset
+            </button>
+        </div>
+
+        <div class="packages-list" id="packagesList"></div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Edit Field</h2>
+                <button class="close" onclick="closeEditModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="edit-form" id="editForm">
+                <!-- Form will be populated dynamically -->
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-secondary" onclick="closeEditModal()">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button class="btn-primary" onclick="saveEdit()">
+                    <i class="fas fa-check"></i> Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div id="exportModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Export Code</h2>
+                <button class="close" onclick="closeExportModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <p style="font-size: 0.8em; color: #666; margin-bottom: 12px;">Copy and send to your developer:</p>
+            <div class="code-output" id="codeOutput"></div>
+            <button class="btn-primary" style="width: 100%; margin-top: 12px;" onclick="copyToClipboard()">
+                <i class="fas fa-copy"></i> Copy Code
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="success-message" id="successMsg">
+        <i class="fas fa-check-circle"></i> Saved Successfully!
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'travelPackagesData';
+        let editingData = null;
+
+        const defaultPackages = [
+            {
+                name: "Shimla Manali",
+                location: "Himachal Pradesh",
+                image: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=400&h=300&fit=crop",
+                price: 9600,
+                originalPrice: 12000,
+                discount: 20,
+                itinerary: [
+                    { day: "Day 1", title: "Arrival in Shimla", description: "Welcome to Shimla! Check-in at hotel, evening Mall Road visit." }
+                ]
+            }
+        ];
+
+        function loadData() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            return stored ? JSON.parse(stored) : defaultPackages;
+        }
+
+        function saveData(packages) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(packages));
+            showSuccessMessage();
+        }
+
+        function showSuccessMessage() {
+            const msg = document.getElementById('successMsg');
+            msg.classList.add('show');
+            setTimeout(() => msg.classList.remove('show'), 2000);
+        }
+
+        function renderPackages() {
+            const packages = loadData();
+            const container = document.getElementById('packagesList');
+            container.innerHTML = '';
+
+            packages.forEach((pkg, index) => {
+                container.innerHTML += createPackageCard(pkg, index);
+            });
+
+            packages.forEach((_, index) => {
+                setupToggle(index);
+            });
+        }
+
+        function createPackageCard(pkg, index) {
+            let itineraryHTML = pkg.itinerary.map((day, dayIndex) => `
+                <div class="day-item">
+                    <div class="day-info">
+                        <div class="day-label">${day.day}</div>
+                        <div class="day-title">${day.title}</div>
+                        <div class="day-desc">${day.description}</div>
+                    </div>
+                    <div style="display: flex; gap: 4px;">
+                        <button class="icon-btn edit" onclick="openDayEditModal(${index}, ${dayIndex})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="icon-btn delete" onclick="removeDay(${index}, ${dayIndex})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            return `
+                <div class="package-card">
+                    <div class="package-header" onclick="togglePackage(${index})">
+                        <div class="header-left">
+                            <img src="${pkg.image}" alt="${pkg.name}" class="package-img" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22><rect fill=%22%23ddd%22 width=%22100%22 height=%22100%22/></svg>'">
+                            <div>
+                                <h2 id="name-${index}">${pkg.name}</h2>
+                            </div>
+                        </div>
+                        <span class="toggle-icon collapsed" id="icon-${index}">
+                            <i class="fas fa-chevron-down"></i>
+                        </span>
+                    </div>
+                    
+                    <div class="package-content" id="content-${index}">
+                        <div class="content-item">
+                            <div class="item-info">
+                                <div class="item-label">Package Name</div>
+                                <div class="item-value">${pkg.name}</div>
+                            </div>
+                            <button class="icon-btn edit" onclick="openFieldEditModal(${index}, 'name', '${pkg.name}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </div>
+
+                        <div class="content-item">
+                            <div class="item-info">
+                                <div class="item-label">Location</div>
+                                <div class="item-value">${pkg.location}</div>
+                            </div>
+                            <button class="icon-btn edit" onclick="openFieldEditModal(${index}, 'location', '${pkg.location}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </div>
+
+                        <div class="content-item">
+                            <div class="item-info">
+                                <div class="item-label">Image URL</div>
+                                <div class="item-value" style="word-break: break-all; font-size: 0.7em;">${pkg.image}</div>
+                            </div>
+                            <button class="icon-btn edit" onclick="openFieldEditModal(${index}, 'image', '${pkg.image}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </div>
+
+                        <div class="content-item">
+                            <div class="item-info">
+                                <div class="item-label">Original Price</div>
+                                <div class="item-value">₹${pkg.originalPrice}</div>
+                            </div>
+                            <button class="icon-btn edit" onclick="openFieldEditModal(${index}, 'originalPrice', ${pkg.originalPrice})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </div>
+
+                        <div class="content-item">
+                            <div class="item-info">
+                                <div class="item-label">Discount %</div>
+                                <div class="item-value">${pkg.discount}%</div>
+                            </div>
+                            <button class="icon-btn edit" onclick="openFieldEditModal(${index}, 'discount', ${pkg.discount})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </div>
+
+                        <div class="content-item">
+                            <div class="item-info">
+                                <div class="item-label">Final Price</div>
+                                <div class="item-value">₹${pkg.price}</div>
+                            </div>
+                        </div>
+
+                        <div class="itinerary-section">
+                            <h3><i class="fas fa-calendar-alt"></i> Itinerary (${pkg.itinerary.length} days)</h3>
+                            <div class="itinerary-toggle" onclick="toggleItinerary(${index})">
+                                <span>View Days</span>
+                                <span id="iti-icon-${index}"><i class="fas fa-chevron-down"></i></span>
+                            </div>
+                            <div class="days-container" id="days-container-${index}">
+                                ${itineraryHTML}
+                                <button class="add-btn-large" onclick="addDay(${index})">
+                                    <i class="fas fa-plus"></i> Add Day
+                                </button>
+                            </div>
+                        </div>
+
+                        <button class="delete-btn-large" onclick="removePackage(${index})">
+                            <i class="fas fa-trash"></i> Delete Package
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function togglePackage(index) {
+            const content = document.getElementById(`content-${index}`);
+            const icon = document.getElementById(`icon-${index}`);
+            
+            content.classList.toggle('show');
+            icon.classList.toggle('expanded');
+            icon.classList.toggle('collapsed');
+        }
+
+        function toggleItinerary(index) {
+            const container = document.getElementById(`days-container-${index}`);
+            const icon = document.getElementById(`iti-icon-${index}`);
+            
+            container.classList.toggle('show');
+            icon.innerHTML = container.classList.contains('show') ? '<i class="fas fa-chevron-up"></i>' : '<i class="fas fa-chevron-down"></i>';
+        }
+
+        function setupToggle(index) {
+            // Setup is complete
+        }
+
+        function openFieldEditModal(pkgIndex, field, value) {
+            editingData = { type: 'field', pkgIndex, field };
+            
+            const form = document.getElementById('editForm');
+            const fieldLabel = field.charAt(0).toUpperCase() + field.slice(1);
+            
+            form.innerHTML = `
+                <div class="form-group">
+                    <label>${fieldLabel}</label>
+                    <input type="text" id="editInput" value="${value}" placeholder="Enter ${fieldLabel}">
+                    <div class="old-value">Previous: ${value}</div>
+                </div>
+            `;
+            
+            document.getElementById('modalTitle').textContent = `Edit ${fieldLabel}`;
+            document.getElementById('editModal').style.display = 'block';
+            
+            setTimeout(() => document.getElementById('editInput').focus(), 100);
+        }
+
+        function openDayEditModal(pkgIndex, dayIndex) {
+            const packages = loadData();
+            const day = packages[pkgIndex].itinerary[dayIndex];
+            
+            editingData = { type: 'day', pkgIndex, dayIndex };
+            
+            const form = document.getElementById('editForm');
+            form.innerHTML = `
+                <div class="form-group">
+                    <label>Day Label</label>
+                    <input type="text" id="editDay" value="${day.day}" placeholder="e.g., Day 1">
+                </div>
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" id="editTitle" value="${day.title}" placeholder="e.g., Arrival in Shimla">
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="editDescription" placeholder="Describe the day's activities...">${day.description}</textarea>
+                </div>
+            `;
+            
+            document.getElementById('modalTitle').textContent = `Edit ${day.day}`;
+            document.getElementById('editModal').style.display = 'block';
+            
+            setTimeout(() => document.getElementById('editDay').focus(), 100);
+        }
+
+        function saveEdit() {
+            if (!editingData) return;
+
+            const packages = loadData();
+            const pkg = packages[editingData.pkgIndex];
+
+            if (editingData.type === 'field') {
+                const newValue = document.getElementById('editInput').value;
+                pkg[editingData.field] = isNaN(newValue) ? newValue : Number(newValue);
+                
+                if (editingData.field === 'originalPrice' || editingData.field === 'discount') {
+                    pkg.price = Math.round(pkg.originalPrice - (pkg.originalPrice * pkg.discount / 100));
+                }
+            } else if (editingData.type === 'day') {
+                pkg.itinerary[editingData.dayIndex].day = document.getElementById('editDay').value;
+                pkg.itinerary[editingData.dayIndex].title = document.getElementById('editTitle').value;
+                pkg.itinerary[editingData.dayIndex].description = document.getElementById('editDescription').value;
+            }
+
+            saveData(packages);
+            const pkgIndex = editingData.pkgIndex;
+            renderPackages();
+            closeEditModal();
+            
+            // Reopen the package that was being edited
+            setTimeout(() => {
+                const content = document.getElementById(`content-${pkgIndex}`);
+                const icon = document.getElementById(`icon-${pkgIndex}`);
+                if (content && !content.classList.contains('show')) {
+                    content.classList.add('show');
+                    icon.classList.add('expanded');
+                    icon.classList.remove('collapsed');
+                }
+            }, 100);
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+            editingData = null;
+        }
+
+        function addNewPackage() {
+            const packages = loadData();
+            packages.push({
+                name: "New Package",
+                location: "Location",
+                image: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=400&h=300&fit=crop",
+                price: 10000,
+                originalPrice: 12000,
+                discount: 15,
+                itinerary: [{ day: "Day 1", title: "Arrival", description: "Arrival day description" }]
+            });
+            saveData(packages);
+            renderPackages();
+        }
+
+        function removePackage(index) {
+            if (confirm('Delete this package?')) {
+                const packages = loadData();
+                packages.splice(index, 1);
+                saveData(packages);
+                renderPackages();
+            }
+        }
+
+        function addDay(index) {
+            const packages = loadData();
+            const dayNum = packages[index].itinerary.length + 1;
+            packages[index].itinerary.push({
+                day: `Day ${dayNum}`,
+                title: "New Day",
+                description: "Description"
+            });
+            saveData(packages);
+            renderPackages();
+        }
+
+        function removeDay(index, dayIndex) {
+            const packages = loadData();
+            packages[index].itinerary.splice(dayIndex, 1);
+            saveData(packages);
+            renderPackages();
+        }
+
+        function generateCode() {
+            const packages = loadData();
+            return `const PACKAGES = ${JSON.stringify(packages, null, 2)};`;
+        }
+
+        function openExportModal() {
+            document.getElementById('codeOutput').textContent = generateCode();
+            document.getElementById('exportModal').style.display = 'block';
+        }
+
+        function closeExportModal() {
+            document.getElementById('exportModal').style.display = 'none';
+        }
+
+        function copyToClipboard() {
+            navigator.clipboard.writeText(generateCode()).then(() => {
+                alert('✓ Code copied to clipboard!');
+                closeExportModal();
+            });
+        }
+
+        function resetAllData() {
+            if (confirm('Reset all data to default?')) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultPackages));
+                renderPackages();
+                showSuccessMessage();
+                
+                const btn = event.target;
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-hourglass"></i> Wait 10s...';
+                let countdown = 10;
+                
+                const interval = setInterval(() => {
+                    countdown--;
+                    btn.innerHTML = `<i class="fas fa-hourglass"></i> Wait ${countdown}s...`;
+                    if (countdown === 0) {
+                        clearInterval(interval);
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-redo"></i> Reset';
+                    }
+                }, 1000);
+            }
+        }
+
+        window.onclick = function(event) {
+            const editModal = document.getElementById('editModal');
+            const exportModal = document.getElementById('exportModal');
+            if (event.target == editModal) editModal.style.display = 'none';
+            if (event.target == exportModal) exportModal.style.display = 'none';
+        };
+
+        renderPackages();
+    </script>
+</body>
+</html>
